@@ -1,0 +1,45 @@
+# Developed by Arun Venkatesh Ramesh (2019 - 2022), University of Houston
+#    Website: https://rpglab.github.io/resources/ABD_N-1_SCUC_CNR_AMPL/
+#    Github:  https://github.com/rpglab/ABD-Alg_N-1_SCUC_CNR
+
+reset;
+printf "\n\n\n##############  Extensive Formulation SCUC considering Corrective Network ReconfigurationProgram Starts Here ##############\n\n";
+
+model Scuc_OriginalFormulationWithCNRConstraints.mod;
+data dataFile24BusAll.dat;
+#data dataFile73BusAll.dat;
+
+option solver gurobi;
+option gurobi_options('mipgap=0.01 timelim= 2000 bestbound 1');
+option show_stats 1;
+
+#define topology
+for{ j in BRANCH}
+{
+	for { k in BRANCH}
+	{
+		let Nck[j,k] := 1;
+	}
+}
+for{ j in Nk}
+{
+	let Nck[j,j] := 0;
+}
+
+# define problems
+problem ExtensiveSwt: bus_angle, line_flow, gen_supply, reserve, Ugt, Vgt,
+				S, gen_supply_cont, line_flow_cont, bus_angle_cont,
+                PGen1, unitReserve2, unitReserve1, systemReserve, 
+				HR_RampUP, HR_RampDN, HR_RampUP2, HR_RampDN2, 
+				FacetUP, FacetUP2, FacetDN, FacetDN2, SUSD, SUSD2, 
+				Line_FlowEq1, Thermal2, Thermal1, 
+				PowerBal, slack,
+				LineCont1, LineCont2, LineCont3, LineCont4, 
+                LineCont51, LineCont52, LineCont6, LineCont7, 
+                LineCont8, 
+			    Trans_swtch,
+				M_COST;
+				
+solve ExtensiveSwt;
+
+display _total_solve_elapsed_time;

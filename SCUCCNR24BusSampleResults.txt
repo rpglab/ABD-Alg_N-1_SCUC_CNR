@@ -1,0 +1,57 @@
+A-SCUC-CNR
+
+------------ Report The Result --------------
+
+Masterlog [*] :=
+0  547323
+;
+
+nCutNkLog [*] :=
+1  0
+;
+
+_total_solve_elapsed_time = 3.033
+
+T-SCUC-CNR
+
+
+------------ Report The Result --------------
+
+Masterlog [*] :=
+0  547323
+;
+
+nCutNkLog [*] :=
+1  0
+;
+
+_total_solve_elapsed_time = 22.262
+
+
+E-SCUC-CNR
+
+##############  Extensive Formulation with SCUC CNR Program Starts Here ##############
+
+
+Presolve eliminates 15876 constraints and 2427 variables.
+Adjusted problem:
+120333 variables:
+	34989 binary variables
+	85344 linear variables
+268980 constraints, all linear; 843053 nonzeros
+	22560 equality constraints
+	246420 inequality constraints
+1 linear objective; 1787 nonzeros.
+
+Set parameter Username
+Gurobi 9.5.0: mipgap=0.01
+timelim= 2000
+bestbound 1
+Gurobi 9.5.0: optimal solution; objective 547060.7733
+313239 simplex iterations
+1 branch-and-cut nodes
+plus 210243 simplex iterations for intbasis
+absmipgap = 3.37e+03, relmipgap = 0.00616
+
+suffix bestbound OUT;
+_total_solve_elapsed_time = 179.829

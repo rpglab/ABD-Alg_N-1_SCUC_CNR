@@ -1,0 +1,73 @@
+
+ASCUC
+
+------------ Report The Result --------------
+
+Masterlog [*] :=
+0  547323
+1  544815
+2  545727
+3  548734
+4  549486
+;
+
+nCutNkLog [*] :=
+1  2
+2  2
+3  2
+4  2
+5  0
+;
+
+_total_solve_elapsed_time = 13.498
+
+TSCUC
+------------ Report The Result --------------
+
+Masterlog [*] :=
+0  547323
+1  544815
+2  545727
+3  548734
+4  549486
+;
+
+nCutNkLog [*] :=
+1  2
+2  2
+3  2
+4  2
+5  0
+;
+
+_total_solve_elapsed_time = 112.236
+
+
+ESCUC
+
+Presolve eliminates 80048 constraints and 2173 variables.
+Adjusted problem:
+86843 variables:
+	1499 binary variables
+	85344 linear variables
+170176 constraints, all linear; 515911 nonzeros
+	55416 equality constraints
+	114760 inequality constraints
+1 linear objective; 1787 nonzeros.
+
+Set parameter Username
+Gurobi 9.5.0: mipgap=0.01
+timelim= 2000
+bestbound 1
+Gurobi 9.5.0: optimal solution; objective 549103.354
+91369 simplex iterations
+64 branch-and-cut nodes
+plus 131533 simplex iterations for intbasis
+absmipgap = 4.32e+03, relmipgap = 0.00786
+
+suffix bestbound OUT;
+
+
+------------ Report The Result --------------
+
+_total_solve_elapsed_time = 75.859

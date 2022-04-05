@@ -1,0 +1,271 @@
+# Developed by Arun Venkatesh Ramesh (2019 - 2022), University of Houston
+#    Website: https://rpglab.github.io/resources/ABD_N-1_SCUC_CNR_AMPL/
+#    Github:  https://github.com/rpglab/ABD-Alg_N-1_SCUC_CNR
+
+reset;
+printf "\n\n\n##############  Benders Decomposition SCUC with Critical Sub-problem Screener (CSPS) considering Corrective Network Reconfiguration Program Starts Here ##############\n\n";
+
+#model file consists of the constraints
+model Scuc_BendersDecompositionConstraintsWithCNR.mod;
+#############################################################################################
+
+#choose test system
+
+data dataFile24BusAll.dat;
+#data dataFile73BusAll.dat;
+#data dataFilePolishAll.dat;
+##############################################################################################
+
+#choose solver, gurobi or cplex for linear solvers and setup options 
+#tweak mipgap  and increase timelim if the problem does not converge
+option solver gurobi;
+option gurobi_options('mipgap=0.01 timelim=15000 bestbound 1');
+option show_stats 1;
+#############################################################################################
+
+# define problems based on the constraints in model file
+
+#Benders requires a Master and Subproblem. The MILP problem is split as a relaxed Master and sub-problems verify feasibility and add cuts iteratively to the Master problem. 
+#Master Problem
+problem Master: bus_angle, line_flow, gen_supply, reserve, Ugt, Vgt,
+                obj_M,
+                PGen1, unitReserve2, unitReserve1, systemReserve, 
+				HR_RampUP, HR_RampDN, HR_RampUP2, HR_RampDN2, 
+				FacetUP, FacetUP2, FacetDN, FacetDN2, SUSD, SUSD2, 
+				Line_FlowEq, Thermal2, Thermal1, PowerBal,
+				slack,
+				Cut_Defn,
+				costConstr,
+				M_COST;
+
+#PCFC (Post-contingency feasibility check) sub-problem verifies feasibility of post-contingency constraints (tx contingencies only) without network-reconfiguration
+problem PCFC: s1, gen_supply_g, line_flow_k, bus_angle_n, 
+               LineCont1, LineCont2, LineCont3, LineCont4,
+               LineCont5,  
+               LineCont6, LineCont7, LineCont8, 
+			   LineCont999, 
+			   S_Line;
+
+#NR-PCFC (Network-reconfigured post-contingency feasibility check) sub-problem verifies feasibility of post-contingency constraints (tx contingencies only) with network-reconfiguration. A line is removed from the topology systematically to avoid non-linearity and non-convexity			   
+problem NRPCFC: s2, 
+			   gen_supply2_g, line_flow2_k, bus_angle2_n, 
+               LineCont1_swt, LineCont2_swt, LineCont3_swt, LineCont4_swt, 
+               LineCont5_swt,
+               LineCont6_swt, LineCont7_swt, LineCont8_swt, 
+			   LineCont999_swt, 
+			   S_Line2;
+
+#CSPS (Critical sub-problem screener) for each sub-problem uses LODF (line outage distribution factor) to calculate change in flow when a line is lost, identify the sub-problems (critical) that violate post-contingency constraints.
+problem CSPS: line_flow3_k, 
+               lineflowChange,
+			   LossDistributionObj;
+#############################################################################################
+
+# Initial DUAL VARIABLES value.
+param s1log {1..nCUT, c in Nk, t in LOAD};			   
+param nCutNkLog {1..nCUT};
+
+#flags
+param solved;
+param lodfFlag;
+
+# Iteration loop
+printf "\n\n--------------  Solving Master Problem Initially. --------------\n\n" > result.txt;
+let nCUT := 0;
+# first solve Master problem
+solve Master;
+display _total_solve_elapsed_time;
+printf "\n\n--------------  Master Problem solved Initially. --------------\n\n" > result.txt;
+param Masterlog {0..nCUT}; let Masterlog[0] := M_COST;
+let nCUT := 1;
+
+repeat 
+{
+	printf "\n\n\n//////////////////  ITERATION %d  //////////////////\n\n", nCUT > result.txt;
+	let solved := 1;	
+	let nCutNkLog[nCUT] := 0;
+	
+	#Save commitment (Ugt) and dispatch (Pgt) variable values of each Generator in each time period from Master to Parameters for sub problems 
+	for {t in LOAD}
+	{
+	    let t_iter := t;
+		
+	    for{g in GEND}
+		{
+		    if abs(gen_supply[g,t]) <= 0.01 then
+		    {
+		        let gen_supply_fix[g] := 0;
+		    }
+		    else
+		    {
+		        let gen_supply_fix[g] := gen_supply[g,t];
+		    }
+		    if abs(Ugt[g,t] - 1) <= 0.01 then
+		    {
+		        let ugt_fix[g] := 1;
+		    }
+		    else if abs(Ugt[g,t] - 0) <= 0.01 then
+		    {
+		        let ugt_fix[g] := 0;
+		    }
+		    else
+		    {
+		        printf "\n\n!!!!!!!!!  Something wrong when passing value from Master-problem to Sub-problem.  !!!!!!!!!!\n\n" > result.txt;;
+		    }
+		}
+		#Save base case line flows (Pkt) variable values of each line in each time period from Master to parameters for sub problems
+		for{k in BRANCH}
+		{
+		    let line_flow_fix[k] := line_flow[k,t];   
+		}
+		
+		#Perform Critical sub-problem screener (CSPS). For each contingency verify if post-contingency line flows violate line limit constraints  
+	    for{c in Nk}
+		{
+		    let c_line := c;
+		    
+		    let lodfFlag := 0;
+		    
+		    solve CSPS; 
+		    
+		    #identify cricical sub-problem that violate post-contingency constraints
+		    for{lineIter in Nk}
+		    {
+		    	if abs(line_flow3_k[lineIter]) > branch_rateC[lineIter] then
+		    	{
+		    		let lodfFlag := 1;
+		    	}
+		    }
+		    
+		    if lodfFlag < 1 then
+		    {
+		    		printf "\n##############  Lodf Calculation revealed that , t: %d, c: %d in %d-th iteration is feasible  ##############\n\n",t,c,nCUT > subp1LodfCleared.txt;    
+	    	    	for{g in GEND}
+			    	{
+			        	let D1gct[nCUT,g,c,t] := 0;
+			        	let D2gct[nCUT,g,c,t] := 0;
+			        	let D3gct[nCUT,g,c,t] := 0;
+			        	let D4gct[nCUT,g,c,t] := 0;
+			        	let CkCut[nCUT,c,t] := 0;
+						let MarkNk[nCUT,c,t] := 1;
+			    	}
+		       		let s1log[nCUT,c,t] := S_Line;
+		    }
+		    else #If Critical sub-problem then perform PCFC initially
+		    {
+		    
+		    solve PCFC;
+		    	    
+			if PCFC.result == 'infeasible' then 
+			{
+				printf "\n##############  Something wrong when solving sub-problem1, t: %d, c: %d in %d-th iteration! It is infeasible which should not happen !!!  ##############\n\n",t,c,nCUT > subp1Infeasible.txt;
+				break;
+			}			
+			
+			if abs(S_Line - 0) >= 1e-5 then   # If PCFC constraints are violated then perform NRPCFC
+			{
+				printf "\n##############  sub-problem1 infeasible, t: %d, c: %d in %d-th iteration!##############\n\n",t,c,nCUT > subp1Infeasible.txt;
+				
+				for{i in Nk} # for 24Bus and 73 Bus system (can be used for Polish system too)
+				#for{i in NLINES20}#use in polish system to make faster (list of 20 closest lines)
+				{
+					let s_line := i; # for 24Bus and 73 Bus system (can be used for Polish system too)
+					#let s_line := CdLnHnd[c,i]; #use in polish system to make faster (list of 20 closest lines)
+					solve NRPCFC;
+				
+					if NRPCFC.result == 'infeasible' then
+			    	{
+			    		printf "\n##############  Something wrong when solving sub-problem2, t: %d, c: %d in %d-th iteration! It is infeasible which should not happen !!!  ##############\n\n",t,c,nCUT > result.txt; 
+						break;
+					}
+					if abs(S_Line2 - 0) <= 1e-5 then   # If NRPCFC constraints are violated then add a cut to Master
+					{
+						printf "\n##############  no cut required for sub-problem2, t: %d, c: %d in %d-th iteration!##############\n\n",t,c,nCUT > subp2feasible.txt;
+						printf "\n##############  Switch Line %d ##############\n\n",i > subp2feasible.txt;
+						break;
+					}
+				}
+				
+				if NRPCFC.result == 'infeasible' then
+			    {
+			    	printf "\n##############  Something wrong when solving sub-problem2, t: %d, c: %d in %d-th iteration! It is infeasible which should not happen !!!  ##############\n\n",t,c,nCUT > result.txt; 
+					break;
+				}
+				if abs(S_Line2 - 0) >= 1e-5 then   # If PCFC and NRPCFC constraints are violated then add a cut to Master
+				{
+					printf "\n##############  adding cut for sub-problem2, t: %d, c: %d in %d-th iteration!##############\n\n",t,c,nCUT > subp2Infeasible.txt;
+					solve PCFC; #cut is alwasy from PCFC
+	        		
+	        		let {g in GEND} D1gct[nCUT,g,c,t] := LineCont1[g].dual;
+	        		let {g in GEND} D2gct[nCUT,g,c,t] := LineCont2[g].dual;
+	            	let {g in GEND} D3gct[nCUT,g,c,t] := LineCont3[g].dual;
+	        		let {g in GEND} D4gct[nCUT,g,c,t] := LineCont4[g].dual;
+	        		
+	        		let CkCut[nCUT,c,t] := sum{k in BRANCH: k != c}branch_rateC[k]*LineCont6[k].dual
+	        	                 + sum{k in BRANCH: k != c}branch_rateC[k]*LineCont7[k].dual 
+	        				     + sum{n in BUS}Bus_Pd[n,t]*LineCont8[n].dual;
+	        		
+	        		let MarkNk[nCUT,c,t] := 0;
+	        		display CkCut[nCUT,c,t];
+					let solved := 0;
+					let nCutNkLog[nCUT] := nCutNkLog[nCUT] + 1;
+	            	let s1log[nCUT,c,t] := S_Line;
+				}
+				else
+				{
+	    	    	for{g in GEND}
+			    	{
+			        	let D1gct[nCUT,g,c,t] := 0;
+			        	let D2gct[nCUT,g,c,t] := 0;
+			        	let D3gct[nCUT,g,c,t] := 0;
+			        	let D4gct[nCUT,g,c,t] := 0;
+			    	}
+			    	let CkCut[nCUT,c,t] := 0;
+					let MarkNk[nCUT,c,t] := 1;
+		       		let s1log[nCUT,c,t] := S_Line;
+				}
+
+			}
+			else
+			{
+					printf "\n$$$$$$$$$$$$$  Sub-Problem1, t: %d, c: %d, is feasible in %d-th iteration ---- Great! -----\n\n",t,c,nCUT > subp1feasible.txt;
+	    	    	for{g in GEND}
+			    	{
+			        	let D1gct[nCUT,g,c,t] := 0;
+			        	let D2gct[nCUT,g,c,t] := 0;
+			        	let D3gct[nCUT,g,c,t] := 0;
+			        	let D4gct[nCUT,g,c,t] := 0;
+			        	let CkCut[nCUT,c,t] := 0;
+						let MarkNk[nCUT,c,t] := 1;
+			    	}
+		       		let s1log[nCUT,c,t] := S_Line;
+			}
+			}
+		}	
+	}
+	
+	display _total_solve_elapsed_time;
+
+    if solved == 1 then 
+	{
+	    printf "\n\n***************   Problem Converged    *****************\n\n";
+		break;
+	}
+	
+	# Solve master after cut is added
+    printf "\n\n##############  Re-Solving Master Problem in %d-th iteration.  ##############\n\n", nCUT;
+    solve Master;
+    display _total_solve_elapsed_time;
+	let Masterlog[nCUT] := M_COST;
+	
+	display s1log;
+    #display s2log;
+	display Masterlog;
+
+	let nCUT := nCUT + 1;	
+}
+
+printf "\n\n------------ Report The Result --------------\n\n";
+display Masterlog;
+display nCutNkLog;
+display _total_solve_elapsed_time;
