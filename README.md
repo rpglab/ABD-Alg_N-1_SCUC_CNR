@@ -22,19 +22,12 @@ Model files defines the variables, parameters and mathematical constraints.
 
 ### Run Files:
 Run file is script file that sequentially runs ampl commands. The main goal of the run file is to choose the appropriate datafile, select the solver (gurobi/cplex linear solvers for MILP/LP), define the constrains required for respective MILP/LP problems and solve the models. 
-
-`1. *ESCUC.run* - Extensive formulation of N-1 SCUC model.`
-
-`2. *TSCUC.run* - Iterative Benders Decomposition based N-1 SCUC algorithm.`
-
-`3. *ASCUC.run* - Iterative Accelerated Benders Decomposition based N-1 SCUC algorithm.`
-
-`4. *ESCUCCNR.run* - Extensive formulation of N-1 SCUC considering Corrective Network Reconfiguration model.`
-
-`5. *TSCUCCNR.run* - Iterative Benders Decomposition based N-1 SCUC with Corrective Network Reconfiguration algorithm.`
-
-`6. *ASCUCCNR.run* - Iterative Accelerated Benders Decomposition based N-1 SCUC with Corrective Network Reconfiguration algorithm.`
-
+1. *ESCUC.run* - Extensive formulation of N-1 SCUC model.
+2. *TSCUC.run* - Iterative Benders Decomposition based N-1 SCUC algorithm.
+3. *ASCUC.run* - Iterative Accelerated Benders Decomposition based N-1 SCUC algorithm.
+4. *ESCUCCNR.run* - Extensive formulation of N-1 SCUC considering Corrective Network Reconfiguration model.
+5. *TSCUCCNR.run* - Iterative Benders Decomposition based N-1 SCUC with Corrective Network Reconfiguration algorithm.
+6. *ASCUCCNR.run* - Iterative Accelerated Benders Decomposition based N-1 SCUC with Corrective Network Reconfiguration algorithm.
 Note: The combination of data, model and run file are required to execute the above scripts. Decomposed models are iterative in nature whereas the extensive model is a single MILP problem which is co-optimized. Ensure that all files are in the same folder.
 
 ### How to execute:
