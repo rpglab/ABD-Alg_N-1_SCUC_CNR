@@ -10,7 +10,7 @@ Data file contains transmission, generator, bus information along with a sample 
 2. *dataFile73BusAll.dat* - Contains all basic parameters required for IEEE 73-bus system.
 3. *dataFilePolishAll.dat* - Contains all basic parameters required for Polish system with 2383 buses.
 
-* IEEE 24-bus system is one of the three areas of the IEEE 73-bus system. They are described in this reference: "The IEEE Reliability Test System-1996. A report prepared by the Reliability Test System Task Force of the Application of Probability Methods Subcommittee" and link is <a class="" target="_blank" href="https://ieeexplore.ieee.org/document/780914">here</a>. 
+* IEEE 24-bus system is one of the three areas of the IEEE 73-bus system. They are described in this reference: "The IEEE Reliability Test System-1996. A report prepared by the Reliability Test System Task Force of the Application of Probability Methods Subcommittee" and link is <a class="off" target="_blank" href="https://ieeexplore.ieee.org/document/780914">here</a>. 
 * The 2383-bus Polish system was converted from matpower (https://matpower.org/). The data was provided by Roman Korab (roman.korab@polsl.pl).
 * Some modifications may be made to the original data for the above systems.
 
