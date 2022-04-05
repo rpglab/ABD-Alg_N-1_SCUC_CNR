@@ -50,7 +50,7 @@ Paper website: https://rpglab.github.io/papers/ArunRamesh-AccDecompSCUC_CNR/
 
 
 ## Contributions:
-Built upon our existing <a class="" href="/resources/N-1_SCUC-AMPL/"  target="_blank">code</a>, Arun Venkatesh Ramesh developed this set of programs. Xingpeng Li provided the initial idea and supervised this work.
+Built upon our existing code (https://github.com/rpglab/N-1_SCUC), Arun Venkatesh Ramesh developed this set of programs. Xingpeng Li provided the initial idea and supervised this work.
 
 
 ## Contact:
