@@ -46,8 +46,9 @@ If you use these codes for your work, please cite the following paper:
 
 Arun Venkatesh Ramesh, Xingpeng Li and Kory W. Hedman, "An Accelerated-Decomposition Approach for Security-Constrained Unit Commitment With Corrective Network Reconfiguration," *IEEE Transactions on Power Systems*, vol. 37, no. 2, pp. 887-900, Mar. 2022. doi: 10.1109/TPWRS.2021.3098771.
 
-Paper website: https://rpglab.github.io/papers/ArunRamesh-AccDecompSCUC_CNR/
-Paper official publication website: https://ieeexplore.ieee.org/document/9492752
+Paper website: 'https://rpglab.github.io/papers/ArunRamesh-AccDecompSCUC_CNR/
+
+Paper official publication website: 'https://ieeexplore.ieee.org/document/9492752
 
 ## Contributions:
 Built upon our existing <a class="" href="/resources/N-1_SCUC-AMPL/"  target="_blank">code</a>, Arun Venkatesh Ramesh developed this set of programs. Xingpeng Li provided the initial idea and supervised this work.
