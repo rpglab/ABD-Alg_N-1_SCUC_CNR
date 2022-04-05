@@ -48,7 +48,6 @@ Arun Venkatesh Ramesh, Xingpeng Li and Kory W. Hedman, "An Accelerated-Decomposi
 
 Paper website: https://rpglab.github.io/papers/ArunRamesh-AccDecompSCUC_CNR/
 
-Paper official publication website: https://ieeexplore.ieee.org/document/9492752
 
 ## Contributions:
 Built upon our existing <a class="" href="/resources/N-1_SCUC-AMPL/"  target="_blank">code</a>, Arun Venkatesh Ramesh developed this set of programs. Xingpeng Li provided the initial idea and supervised this work.
