@@ -37,9 +37,8 @@ Note: The combination of data, model and run file are required to execute the ab
 2. Select folder with the above files
 3. Open appropriate run file and un-comment the datafile (dataFile24BusAll.dat/dataFile73BusAll.dat/dataFilePolishAll.dat) required for execution.
 4. In AMPL execute the command: include runFileName.run (for e.g. include ESCUC.run) 
-Note:
-Extensive models require substantial computer resources to solve. Unrealistic for IEEE 73-bus system and polish network for ESCUCCNR, and polish network for ESCUC.  
-Requires AMPL to be installed. Available Online: ampl.com
+
+Note: Extensive models require substantial computer resources to solve. Unrealistic for IEEE 73-bus system and polish network for ESCUCCNR, and polish network for ESCUC. Requires AMPL to be installed. Available Online: ampl.com
 
 
 ## Citation:
