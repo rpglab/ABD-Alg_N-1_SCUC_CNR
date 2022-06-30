@@ -1,4 +1,6 @@
 # Developed by Arun Venkatesh Ramesh (2019 - 2022), University of Houston
+#    The N-1 SCUC Benders decomposition codes from (https://rpglab.github.io/resources/N-1_SCUC-AMPL/)
+#       are adopted to build this program.
 #    Website: https://rpglab.github.io/resources/ABD_N-1_SCUC_CNR_AMPL/
 #    Github:  https://github.com/rpglab/ABD-Alg_N-1_SCUC_CNR
 

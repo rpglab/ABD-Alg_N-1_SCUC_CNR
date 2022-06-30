@@ -1,5 +1,7 @@
 # SCUC consider N-1 implementing bender decomposition Constraints
 # Choose problems for A/TSCUC, A/TSCUC-CNR
+#    The N-1 SCUC Benders decomposition codes from (https://rpglab.github.io/resources/N-1_SCUC-AMPL/)
+#       are adopted to build this program.
 
 #### SETS
 set BUS;    # set of buses

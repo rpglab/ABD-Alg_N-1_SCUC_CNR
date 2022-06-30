@@ -1,4 +1,6 @@
 # SCUC consider N-1 (Only Transmission Constraints) Original Formulation
+#    The N-1 SCUC Benders decomposition codes from (https://rpglab.github.io/resources/N-1_SCUC-AMPL/)
+#       are adopted to build this program.
 
 set BUS;    # set of buses
 set BRANCH; # set of branches
